@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AntiTab - Bypass Tab Check</title>
+  <link rel="stylesheet" href="popup.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Header -->
+    <header class="header">
+      <div class="brand">
+        <div class="logo-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+            <path d="M9 12l2 2 4-4"></path>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <h1>AntiTab <span class="badge-v">v1.0</span></h1>
+          <p class="subtitle">Bỏ qua kiểm tra Tab & Màn hình</p>
+        </div>
+      </div>
+      <div class="status-pill" id="statusPill">
+        <span class="status-dot"></span>
+        <span class="status-text" id="statusText">ĐANG BẬT</span>
+      </div>
+    </header>
+
+    <!-- Hero Card / Master Switch -->
+    <div class="card master-card">
+      <div class="master-info">
+        <div class="master-title">Bảo vệ chống Check Tab</div>
+        <div class="master-desc" id="masterDesc">Tự động phớt lờ sự kiện chuyển tab & rời chuột</div>
+      </div>
+      <label class="switch master-switch">
+        <input type="checkbox" id="masterToggle" checked>
+        <span class="slider round"></span>
+      </label>
+    </div>
+
+    <!-- Live Counter -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <span class="stat-value" id="domainBlockedCount">0</span>
+        <span class="stat-label">Trang hiện tại</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-value glow" id="totalBlockedCount">0</span>
+        <span class="stat-label">Tổng đã phớt lờ</span>
+      </div>
+    </div>
+
+    <!-- Domain Specific Whitelist Switch -->
+    <div class="card domain-card">
+      <div class="domain-info">
+        <span class="domain-icon">🌐</span>
+        <span class="domain-name" id="currentDomain">Đang tải...</span>
+      </div>
+      <button class="btn-whitelist" id="whitelistBtn">
+        <span>Danh sách trắng</span>
+      </button>
+    </div>
+
+    <!-- Detailed Feature Options -->
+    <div class="section-title">Cấu hình chi tiết</div>
+
+    <div class="options-group">
+      <!-- Option 1: Visibility API -->
+      <div class="option-item">
+        <div class="option-icon">👁️</div>
+        <div class="option-details">
+          <div class="option-name">Giả lập Tab luôn mở (Visibility)</div>
+          <div class="option-desc">Chặn document.hidden & visibilityState</div>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="toggleVisibility" checked>
+          <span class="slider round"></span>
+        </label>
+      </div>
+
+      <!-- Option 2: Blur & Focus -->
+      <div class="option-item">
+        <div class="option-icon">🔍</div>
+        <div class="option-details">
+          <div class="option-name">Chặn mất Focus (Window Blur)</div>
+          <div class="option-desc">Chặn sự kiện blur khi click sang cửa sổ khác</div>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="toggleBlur" checked>
+          <span class="slider round"></span>
+        </label>
+      </div>
+
+      <!-- Option 3: Force hasFocus -->
+      <div class="option-item">
+        <div class="option-icon">⚡</div>
+        <div class="option-details">
+          <div class="option-name">Ép document.hasFocus()</div>
+          <div class="option-desc">Luôn trả về true khi web kiểm tra focus</div>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="toggleHasFocus" checked>
+          <span class="slider round"></span>
+        </label>
+      </div>
+
+      <!-- Option 4: Mouse Leave -->
+      <div class="option-item">
+        <div class="option-icon">🖱️</div>
+        <div class="option-details">
+          <div class="option-name">Chặn rời chuột khỏi màn hình</div>
+          <div class="option-desc">Chặn sự kiện mouseleave / mouseout</div>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="toggleMouseLeave" checked>
+          <span class="slider round"></span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <button class="btn-secondary" id="openTestPageBtn">🧪 Mở trang Test Kiểm Tra</button>
+      <button class="btn-icon" id="resetStatsBtn" title="Đặt lại thống kê">🔄</button>
+    </footer>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🧪 AntiTab Test Suite - Kiểm Tra Chuyển Tab</title>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --card-bg: #161b22;
+      --text: #c9d1d9;
+      --accent-cyan: #58a6ff;
+      --accent-green: #3fb950;
+      --accent-red: #f85149;
+      --border: #30363d;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      padding: 30px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    header {
+      margin-bottom: 24px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 16px;
+    }
+
+    h1 { color: #fff; font-size: 24px; margin-bottom: 8px; display: flex; align-items: center; gap: 10px; }
+    p.subtitle { color: #8b949e; font-size: 14px; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+    }
+
+    .card-title {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #8b949e;
+      margin-bottom: 8px;
+    }
+
+    .card-value {
+      font-size: 20px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .status-ok { background: rgba(63, 185, 80, 0.2); color: var(--accent-green); border: 1px solid var(--accent-green); }
+    .status-fail { background: rgba(248, 81, 73, 0.2); color: var(--accent-red); border: 1px solid var(--accent-red); }
+
+    .logs-container {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+    }
+
+    .logs-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .log-box {
+      background: #090d12;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      height: 250px;
+      overflow-y: auto;
+      padding: 12px;
+      font-family: monospace;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .log-entry {
+      margin-bottom: 4px;
+      border-bottom: 1px dashed rgba(255, 255, 255, 0.05);
+      padding-bottom: 2px;
+    }
+
+    .log-time { color: #8b949e; }
+    .log-event { color: var(--accent-cyan); font-weight: bold; }
+    .log-warn { color: var(--accent-red); }
+
+    .instructions {
+      margin-top: 24px;
+      background: rgba(88, 166, 255, 0.1);
+      border: 1px solid rgba(88, 166, 255, 0.3);
+      border-radius: 8px;
+      padding: 16px;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .btn-clear {
+      background: #21262d;
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .btn-clear:hover { background: #30363d; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>🧪 Trang Test Chống Kiểm Tra Chuyển Tab</h1>
+    <p class="subtitle">Trang này mô phỏng các phương pháp kiểm tra chuyển tab / mất focus của các trang thi trực tuyến hoặc kiểm tra online.</p>
+  </header>
+
+  <div class="grid">
+    <div class="card">
+      <div class="card-title">Trạng Thái Tab (document.hidden)</div>
+      <div class="card-value" id="valHidden">false</div>
+      <div style="margin-top: 8px;" id="badgeHidden" class="status-badge status-ok">ĐANG MỞ (VISIBLE)</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Visibility State</div>
+      <div class="card-value" id="valState">visible</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Cửa Sổ Focus (document.hasFocus())</div>
+      <div class="card-value" id="valFocus">true</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Số Lần Vi Phạm (Chuyển Tab / Mất Focus)</div>
+      <div class="card-value" id="valViolations" style="color: var(--accent-red);">0</div>
+    </div>
+  </div>
+
+  <div class="logs-container">
+    <div class="logs-header">
+      <h3>📜 Nhật Ký Sự Kiện Trình Duyệt (Live Event Log)</h3>
+      <button class="btn-clear" id="btnClearLog">Xóa nhật ký</button>
+    </div>
+    <div class="log-box" id="logBox"></div>
+  </div>
+
+  <div class="instructions">
+    <strong>💡 Hướng dẫn kiểm tra:</strong>
+    <ol style="margin-left: 20px; margin-top: 8px;">
+      <li><strong>Khi TẮT Extension:</strong> Thử chuyển sang tab khác hoặc click sang màn hình khác -> Số lần vi phạm sẽ tăng, log sẽ báo <code>visibilitychange</code> hoặc <code>blur</code>.</li>
+      <li><strong>Khi BẬT Extension AntiTab:</strong> Thử chuyển sang tab khác hoặc click sang ứng dụng khác -> Web <strong>KHÔNG</strong> thể phát hiện bạn đã rời đi, số lần vi phạm vẫn bằng 0!</li>
+    </ol>
+  </div>
+
+  <script>
+    let violationCount = 0;
+
+    const valHidden = document.getElementById('valHidden');
+    const badgeHidden = document.getElementById('badgeHidden');
+    const valState = document.getElementById('valState');
+    const valFocus = document.getElementById('valFocus');
+    const valViolations = document.getElementById('valViolations');
+    const logBox = document.getElementById('logBox');
+    const btnClearLog = document.getElementById('btnClearLog');
+
+    function addLog(eventName, details, isViolation = false) {
+      const time = new Date().toLocaleTimeString();
+      const div = document.createElement('div');
+      div.className = 'log-entry';
+      div.innerHTML = `<span class="log-time">[${time}]</span> <span class="log-event">${eventName}</span>: ${details} ${isViolation ? '<span class="log-warn">⚠️ (Phát hiện chuyển tab!)</span>' : ''}`;
+      logBox.appendChild(div);
+      logBox.scrollTop = logBox.scrollHeight;
+    }
+
+    function updateStateDisplay() {
+      valHidden.textContent = document.hidden;
+      valState.textContent = document.visibilityState;
+      valFocus.textContent = document.hasFocus();
+
+      if (document.hidden || document.visibilityState === 'hidden') {
+        badgeHidden.className = 'status-badge status-fail';
+        badgeHidden.textContent = 'ĐÃ RỜI TAB (HIDDEN)';
+      } else {
+        badgeHidden.className = 'status-badge status-ok';
+        badgeHidden.textContent = 'ĐANG MỞ (VISIBLE)';
+      }
+    }
+
+    // Interval check every 500ms
+    setInterval(updateStateDisplay, 500);
+
+    // 1. Visibilitychange Listener
+    document.addEventListener('visibilitychange', function() {
+      const isHidden = document.hidden || document.visibilityState === 'hidden';
+      if (isHidden) {
+        violationCount++;
+        valViolations.textContent = violationCount;
+        addLog('visibilitychange', `State changed to: ${document.visibilityState}`, true);
+      } else {
+        addLog('visibilitychange', `State changed to: ${document.visibilityState}`, false);
+      }
+      updateStateDisplay();
+    });
+
+    // 2. Blur / Focus Listener on window
+    window.addEventListener('blur', function() {
+      violationCount++;
+      valViolations.textContent = violationCount;
+      addLog('window.blur', 'Cửa sổ bị mất focus (click ra ngoài)', true);
+      updateStateDisplay();
+    });
+
+    window.addEventListener('focus', function() {
+      addLog('window.focus', 'Cửa sổ nhận lại focus', false);
+      updateStateDisplay();
+    });
+
+    // 3. Mouseleave on document
+    document.addEventListener('mouseleave', function(e) {
+      addLog('mouseleave', 'Con trỏ chuột đã rời khỏi khu vực trang web', false);
+    });
+
+    btnClearLog.addEventListener('click', () => {
+      logBox.innerHTML = '';
+      violationCount = 0;
+      valViolations.textContent = '0';
+    });
+
+    addLog('system', 'Khởi tạo trang test kiểm tra tab thành công.', false);
+  </script>
+</body>
+</html>
